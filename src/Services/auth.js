@@ -32,6 +32,37 @@ export const tenantSignup = async (data) => {
     };
   }
 };
+
+export const sendCredsToUser = async (data) => {
+  try {
+    const formData = new URLSearchParams();
+    formData.append("identifier", data.identifier);
+    formData.append("password", data.password);
+
+    const response = await fetch(`${BASE_URL}/api/v1/send-chart-creds`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: formData.toString(),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `Failed to send credentials: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return { success: true, data: result };
+  } catch (error) {
+    console.error("Failed to send credentials:", error.message);
+    return {
+      success: false,
+      message: error.message || 'Failed to send credentials. Please try again.'
+    };
+  }
+};
+
 // user signup
 export const userSignup = async (data) => {
   try {
@@ -58,6 +89,7 @@ export const userSignup = async (data) => {
 
     const result = await response.json();
     console.log("User signup successful:", result);
+    await sendCredsToUser({ identifier: data.email, password: data.password });
 
     return { success: true, data: result };
   } catch (error) {

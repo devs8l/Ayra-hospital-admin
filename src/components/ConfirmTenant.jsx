@@ -44,7 +44,7 @@ export default function ConfirmTenant({
         {/* Header */}
         <div className="py-4 mx-6 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">
-            {isSuccess ? 'Tenant Created!' : 'Confirm Tenant?'}
+            {isSuccess ? 'User Created!' : 'Confirm User?'}
           </h3>
         </div>
         
@@ -57,12 +57,10 @@ export default function ConfirmTenant({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <p className="text-gray-600">Tenant has been created successfully!</p>
+              <p className="text-gray-600">User has been created successfully!</p>
             </div>
           ) : (
             <>
-              
-              
               <div>
                 <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
                   Admin Name
