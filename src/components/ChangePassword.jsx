@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useUser } from '../context/UserContext';
 
-export default function ChangePassword({ 
-  isVisible, 
-  onClose, 
+export default function ChangePassword({
+  isVisible,
+  onClose,
   onConfirm,
   onSuccess
 }) {
@@ -14,6 +14,9 @@ export default function ChangePassword({
     oldPassword: '',
     newPassword: '',
     confirmPassword: ''
+  });
+  const [tenantId, setTenantId] = useState(() => {
+    return localStorage.getItem('tenantId') || null;
   });
   const [errors, setErrors] = useState({});
   const [showPasswords, setShowPasswords] = useState({
@@ -26,27 +29,27 @@ export default function ChangePassword({
 
   const validatePasswords = () => {
     const newErrors = {};
-    
+
     if (!passwords.oldPassword.trim()) {
       newErrors.oldPassword = 'Current password is required';
     }
-    
+
     if (!passwords.newPassword.trim()) {
       newErrors.newPassword = 'New password is required';
     } else if (passwords.newPassword.length < 8) {
       newErrors.newPassword = 'Password must be at least 8 characters';
     }
-    
+
     if (!passwords.confirmPassword.trim()) {
       newErrors.confirmPassword = 'Please confirm your new password';
     } else if (passwords.newPassword !== passwords.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-    
+
     if (passwords.oldPassword === passwords.newPassword && passwords.oldPassword) {
       newErrors.newPassword = 'New password must be different from current password';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -56,7 +59,7 @@ export default function ChangePassword({
       ...prev,
       [field]: value
     }));
-    
+
     // Clear errors for the field being edited
     if (errors[field]) {
       setErrors(prev => ({
@@ -64,7 +67,7 @@ export default function ChangePassword({
         [field]: ''
       }));
     }
-    
+
     // Real-time validation for confirm password
     if (field === 'confirmPassword' && passwords.newPassword && value !== passwords.newPassword) {
       setErrors(prev => ({
@@ -88,12 +91,12 @@ export default function ChangePassword({
 
   const handleConfirm = async () => {
     if (!validatePasswords()) return;
-    
+
     setIsChanging(true);
     try {
       // Pass all required data to the changePassword function
       await onConfirm({
-        tenantId: user.tenant_id,
+        tenantId: tenantId,
         email: user.email,
         oldPassword: passwords.oldPassword,
         newPassword: passwords.newPassword
@@ -147,9 +150,8 @@ export default function ChangePassword({
           onChange={(e) => handleInputChange(field, e.target.value)}
           placeholder={placeholder}
           disabled={isChanging}
-          className={`w-full px-3 py-2 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-            errors[field] ? 'border-red-300 bg-red-50' : 'border-gray-300'
-          }`}
+          className={`w-full px-3 py-2 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${errors[field] ? 'border-red-300 bg-red-50' : 'border-gray-300'
+            }`}
         />
         <button
           type="button"
@@ -184,7 +186,7 @@ export default function ChangePassword({
             {isSuccess ? 'Password Changed!' : 'Change Password'}
           </h3>
         </div>
-        
+
         {/* Body */}
         <div className="px-6 py-6 space-y-4">
           {isSuccess ? (
@@ -207,13 +209,13 @@ export default function ChangePassword({
 
               {/* Current Password */}
               {renderPasswordField('oldPassword', 'Current Password', 'Enter your current password')}
-              
+
               {/* New Password */}
               {renderPasswordField('newPassword', 'New Password', 'Enter your new password')}
-              
+
               {/* Confirm New Password */}
               {renderPasswordField('confirmPassword', 'Confirm New Password', 'Confirm your new password')}
-              
+
               {/* Password Requirements */}
               <div className="flex items-start space-x-2 mt-4 pt-4 border-t border-gray-200">
                 <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -228,7 +230,7 @@ export default function ChangePassword({
             </>
           )}
         </div>
-        
+
         {/* Footer */}
         <div className="px-6 py-4 flex justify-between space-x-3">
           {!isSuccess ? (
