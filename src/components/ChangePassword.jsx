@@ -18,6 +18,10 @@ export default function ChangePassword({
   const [tenantId, setTenantId] = useState(() => {
     return localStorage.getItem('tenantId') || null;
   });
+  const [userData, setUserData] = useState(() => {
+    const data = localStorage.getItem('userData');
+    return data ? JSON.parse(data) : null;
+  });
   const [errors, setErrors] = useState({});
   const [showPasswords, setShowPasswords] = useState({
     oldPassword: false,
@@ -97,7 +101,7 @@ export default function ChangePassword({
       // Pass all required data to the changePassword function
       await onConfirm({
         tenantId: tenantId,
-        email: user.email,
+        email: userData.email,
         oldPassword: passwords.oldPassword,
         newPassword: passwords.newPassword
       });

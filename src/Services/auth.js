@@ -96,6 +96,7 @@ export const userLogin = async (data) => {
       if (result.tenant_info?.tenant_id) {
         localStorage.setItem('tenantId', result.tenant_info.tenant_id);
       }
+      await getCurrentUser();
     }
     return { success: true, data: result };
   } catch (error) {
@@ -164,6 +165,13 @@ export const getCurrentUser = async () => {
     }
 
     const result = await response.json();
+    localStorage.setItem('userData', JSON.stringify({
+      userId: result.user_id,
+      tenantId: result.tenant_id,
+      userType: result.user_type,
+      displayName: result.display_name,
+      email: result.email
+    }));
     return { success: true, data: result };
   } catch (error) {
     console.error("Failed to get current user:", error.message);
