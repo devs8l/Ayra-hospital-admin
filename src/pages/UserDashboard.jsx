@@ -159,11 +159,15 @@ const TenantDashboard = () => {
   const [tenantData, setTenantData] = useState([]);
   const navigate = useNavigate();
 
+  const [tenantId, setTenantId] = useState(() => {
+    return localStorage.getItem('tenantId') || null;
+  });
+
   useEffect(() => {
     const fetchTenants = async () => {
       setIsLoading(true);
       try {
-        const data = await getTenantUsers(user.tenant_id);
+        const data = await getTenantUsers(tenantId);
         setTenantData(data);
         setIsLoading(false);
       } catch (error) {
@@ -184,7 +188,7 @@ const TenantDashboard = () => {
   // Transform your data to match the expected structure
   const specialities = ['Cardiologist', 'Neurologist', 'Orthopedic'];
   const transformedTenantData = tenantData.map(tenant => ({
-    id: user.tenant_id,
+    id: tenantId,
     tenantName: specialities[Math.floor(Math.random() * specialities.length)],
     admin: {
       name: tenant.display_name || 'Unnamed User',

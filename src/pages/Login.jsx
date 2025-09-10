@@ -1,17 +1,25 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { userLogin } from '../Services/auth';
 
 const Login = ({ onLogin }) => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [credentials, setCredentials] = useState({
-    tenantId: '',
     email: '',
     password: ''
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [tenantId, setTenantId] = useState('');
+
+  useEffect(() => {
+    const idFromUrl = searchParams.get('id');
+    if (idFromUrl) {
+      setTenantId(idFromUrl);
+    }
+  }, [searchParams]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,9 +34,13 @@ const Login = ({ onLogin }) => {
     setError('');
     setIsLoading(true);
     try {
-      const res = await userLogin(credentials);
+      const loginData = {
+        ...credentials,
+        tenantId: tenantId
+      };
+      const res = await userLogin(loginData);
       if (res.success) {
-        localStorage.setItem('tenantId', credentials.tenantId);
+        localStorage.setItem('tenantId', tenantId);
         if (onLogin) onLogin();
         navigate('/');
       } else {
@@ -61,19 +73,8 @@ const Login = ({ onLogin }) => {
 
         {/* Login Form - centered vertically */}
         <div className="flex-grow flex flex-col justify-center px-10">
+          
           <form onSubmit={handleSubmit} className="space-y-8">
-            <div>
-              <div className="text-xs text-gray-500 mb-3">Enter Tenant Id</div>
-              <input
-                type="text"
-                name="tenantId"
-                placeholder="Enter Tenant ID"
-                className="w-full px-4 py-3 border-b border-gray-300 focus:outline-none focus:border-blue-500"
-                value={credentials.tenantId}
-                onChange={handleChange}
-                required
-              />
-            </div>
             <div>
               <div className="text-xs text-gray-500 mb-3">Enter Email ID</div>
               <input

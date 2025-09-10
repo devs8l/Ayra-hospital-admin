@@ -31,7 +31,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const menuItems = [
     { icon: Building2, label: 'User Management', path: '/tenant-management' },
     { icon: Users, label: 'Admin Users', path: '/admin-users' },
-    { icon: FileText, label: 'Create User', path: '/tenant-signup' },
+    { icon: FileText, label: 'Create User', path: '/user-signup' },
     { icon: UserPlus, label: 'Audit Logs', path: '/audit-logs' },
     { icon: Settings, label: 'Settings', path: '/settings' },
   ];
