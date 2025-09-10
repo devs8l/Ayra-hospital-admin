@@ -40,7 +40,6 @@ const Login = ({ onLogin }) => {
       };
       const res = await userLogin(loginData);
       if (res.success) {
-        localStorage.setItem('tenantId', tenantId);
         if (onLogin) onLogin();
         navigate('/');
       } else {

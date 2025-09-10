@@ -35,7 +35,7 @@ export const tenantSignup = async (data) => {
 // user signup
 export const userSignup = async (data) => {
   try {
-  
+
     const response = await fetch(`${BASE_URL}/auth/user/signup`, {
       method: "POST",
       headers: {
@@ -81,7 +81,6 @@ export const userLogin = async (data) => {
       body: JSON.stringify({
         identifier: data.email,
         password: data.password,
-        tenant_id: data.tenantId
       }),
     });
 
@@ -94,6 +93,9 @@ export const userLogin = async (data) => {
     // Store access token in localStorage
     if (result.access_token) {
       localStorage.setItem('token', result.access_token);
+      if (result.tenant_info?.tenant_id) {
+        localStorage.setItem('tenantId', result.tenant_info.tenant_id);
+      }
     }
     return { success: true, data: result };
   } catch (error) {
