@@ -6,20 +6,23 @@ import { useUser } from '../context/UserContext';
 export default function CreateUser() {
     const [currentStep, setCurrentStep] = useState(1);
     const { user } = useUser();
+    const [tenantId, setTenantId] = useState(() => {
+        return localStorage.getItem('tenantId') || null;
+    });
     const [formData, setFormData] = useState({
         user_type: 'admin',
         display_name: '',
         email: '',
         password: '',
         confirmPassword: '',
-        tenantId: user?.tenant_id || ''
+        tenantId: user?.tenant_id || tenantId
     });
     const [showModal, setShowModal] = useState(false);
     const [errors, setErrors] = useState({});
 
     const handleInputChange = (field, value) => {
         setFormData(prev => ({ ...prev, [field]: value }));
-        
+
         // Clear error when user starts typing
         if (errors[field]) {
             setErrors(prev => ({ ...prev, [field]: '' }));
@@ -28,23 +31,23 @@ export default function CreateUser() {
 
     const validateStep1 = () => {
         const newErrors = {};
-        
+
         if (!formData.display_name) newErrors.display_name = 'Display name is required';
         if (!formData.user_type) newErrors.user_type = 'User type is required';
-        
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
     const validateStep2 = () => {
         const newErrors = {};
-        
+
         if (!formData.email) {
             newErrors.email = 'Email is required';
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
             newErrors.email = 'Please enter a valid email address';
         }
-        
+
         // Password validation - at least 8 characters with letters and numbers
         if (!formData.password) {
             newErrors.password = 'Password is required';
@@ -53,14 +56,14 @@ export default function CreateUser() {
         } else if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(formData.password)) {
             newErrors.password = 'Password must contain both letters and numbers';
         }
-        
+
         // Confirm password validation
         if (!formData.confirmPassword) {
             newErrors.confirmPassword = 'Please confirm your password';
         } else if (formData.password !== formData.confirmPassword) {
             newErrors.confirmPassword = 'Passwords do not match';
         }
-        
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -82,7 +85,7 @@ export default function CreateUser() {
         if (!validateStep2()) {
             return Promise.reject(new Error('Please fix the validation errors'));
         }
-        
+
         try {
             // Prepare the data for API call (remove confirmPassword as it's not needed in the request)
             const { confirmPassword, ...userData } = formData;
@@ -112,20 +115,20 @@ export default function CreateUser() {
             password: '',
             confirmPassword: ''
         });
-        
+
         // Clear errors
         setErrors({});
         setCurrentStep(1);
     };
 
     const isStep1Valid = formData.display_name && formData.user_type;
-    const isStep2Valid = formData.email && 
-                         formData.password && 
-                         formData.confirmPassword &&
-                         formData.password === formData.confirmPassword &&
-                         formData.password.length >= 8 && 
-                         /(?=.*[a-zA-Z])(?=.*\d)/.test(formData.password) &&
-                         /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
+    const isStep2Valid = formData.email &&
+        formData.password &&
+        formData.confirmPassword &&
+        formData.password === formData.confirmPassword &&
+        formData.password.length >= 8 &&
+        /(?=.*[a-zA-Z])(?=.*\d)/.test(formData.password) &&
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
 
     return (
         <div className="h-full bg-white border rounded-2xl overflow-hidden border-gray-200 flex flex-col">
@@ -160,9 +163,8 @@ export default function CreateUser() {
                                         value={formData.display_name}
                                         onChange={(e) => handleInputChange('display_name', e.target.value)}
                                         placeholder="Enter display name"
-                                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            errors.display_name ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.display_name ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                     />
                                     {errors.display_name && (
                                         <p className="mt-1 text-xs text-red-500">{errors.display_name}</p>
@@ -175,9 +177,8 @@ export default function CreateUser() {
                                     <select
                                         value={formData.user_type}
                                         onChange={(e) => handleInputChange('user_type', e.target.value)}
-                                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            errors.user_type ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.user_type ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                     >
                                         <option value="admin">Admin</option>
                                         <option value="user">User</option>
@@ -204,9 +205,8 @@ export default function CreateUser() {
                                         value={formData.email}
                                         onChange={(e) => handleInputChange('email', e.target.value)}
                                         placeholder="Enter email address"
-                                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            errors.email ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.email ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                     />
                                     {errors.email && (
                                         <p className="mt-1 text-xs text-red-500">{errors.email}</p>
@@ -222,9 +222,8 @@ export default function CreateUser() {
                                             value={formData.password}
                                             onChange={(e) => handleInputChange('password', e.target.value)}
                                             placeholder="Enter password"
-                                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                                errors.password ? 'border-red-500' : 'border-gray-300'
-                                            }`}
+                                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.password ? 'border-red-500' : 'border-gray-300'
+                                                }`}
                                         />
                                         {errors.password && (
                                             <p className="mt-1 text-xs text-red-500">{errors.password}</p>
@@ -242,9 +241,8 @@ export default function CreateUser() {
                                             value={formData.confirmPassword}
                                             onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                                             placeholder="Confirm password"
-                                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                                errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
-                                            }`}
+                                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                                                }`}
                                         />
                                         {errors.confirmPassword && (
                                             <p className="mt-1 text-xs text-red-500">{errors.confirmPassword}</p>
